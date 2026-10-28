@@ -1,181 +1,155 @@
-<!DOCTYPE html><html lang="it"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"><title>L'APP - TINO V10 AI GITHUB</title>
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>APP-TINO V11</title>
+<meta name="theme-color" content="#111827">
 <style>
-*{box-sizing:border-box}body{background:#0d0d0d;color:#fff;font-family:system-ui;margin:0;padding:8px}
-.btn{border:0;border-radius:14px;padding:12px 8px;font-weight:900;font-size:12px;cursor:pointer;margin:3px}
-.btn-yellow{background:#facc15;color:#000;width:100%;font-size:16px;padding:16px;display:block}
-.btn-green{background:#22c55e;color:#000}.btn-blue{background:#38bdf8;color:#000}.btn-dark{background:#2a2a2a;color:#fff;border:1px solid #333}.btn-red{background:#ef4444;color:#fff}.btn-ai{background:linear-gradient(135deg,#8b5cf6,#ec4899);color:#fff;width:100%;padding:16px;font-size:15px;margin:8px 0;border:2px solid #a78bfa}
-.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.card{background:#1e1e1e;border-radius:16px;padding:10px;margin:8px 0;border:1px solid #2e2e2e}
-.badge{padding:4px 8px;border-radius:8px;font-size:10px;font-weight:900;display:inline-block;margin:2px}
-.b-scatola{background:#facc15;color:#000}.b-pos{background:#38bdf8;color:#000}.b-zip{background:#22c55e;color:#000}.b-peso{background:#444;color:#fff}
-input,select,textarea{width:100%;background:#2a2a2a;border:1px solid #444;color:#fff;border-radius:10px;padding:10px;margin:3px 0;font-size:14px}
-textarea.fullpage{height:45vh;font-size:18px;line-height:1.4;padding:14px;background:#1a1a1a;resize:none}
-.small{font-size:11px;opacity:.6}img.thumb{width:100%;border-radius:10px;max-height:300px;object-fit:contain;background:#000;margin:6px 0}
-.preview-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin:6px 0}
-.wizard{position:fixed;inset:0;background:#0d0d0d;z-index:99;overflow:auto;padding:10px;display:none}.wizard.active{display:block}
-.step-title{font-size:18px;font-weight:900;margin:8px 0;color:#facc15}.price-box{background:#2a2a2a;border:2px solid #facc15;border-radius:12px;padding:10px;margin:8px 0}
-.check-row{display:flex;align-items:center;gap:8px;margin:6px 0;background:#2a2a2a;padding:10px;border-radius:10px;border:1px solid #333}.check-row input{width:22px;height:22px}
-.stats-bar{background:#1e1e1e;border-radius:10px;padding:8px;margin:6px 0;border:1px solid #333;color:#facc15;font-size:11px;font-weight:700;text-align:center}
-.search-bar{background:#1e1e1e;border:1px solid #333;border-radius:12px;padding:10px;color:#fff;margin:6px 0}
-.foto-item{position:relative;border-radius:10px;overflow:hidden;border:2px solid #333}.foto-item img{width:100%;height:90px;object-fit:cover;display:block}
-.foto-del{position:absolute;top:2px;right:2px;background:#ef4444;color:white;border:0;border-radius:50%;width:28px;height:28px;font-weight:900}
-.ai-loading{background:#1a1625;border:2px solid #8b5cf6;border-radius:12px;padding:15px;margin:10px 0;text-align:center;display:none}
-</style></head><body>
-<h1>L'APP - TINO</h1><div class="sub">V10 GITHUB + AI - FIX BICCHIERE - Titolo come in chat</div>
-<button class="btn btn-yellow" onclick="window.openWizard()">+ NUOVO ARTICOLO</button>
-<div class="grid3" style="margin:8px 0"><button class="btn btn-green" onclick="window.backup()">BACKUP</button><button class="btn btn-blue" onclick="window.zipNuovi()">ZIP NUOVI</button><button class="btn btn-dark" onclick="window.ripristina()">RIPRISTINA</button></div>
-<div class="grid3"><button class="btn btn-green" style="background:#15803d;color:white" onclick="window.exportExcel()">EXPORT EXCEL</button><button class="btn btn-dark" onclick="window.liberaSpazio()">Libera Spazio</button><button class="btn btn-dark" onclick="window.resetZip()">Reset ZIP</button></div>
-<div class="stats-bar" id="stats">Caricamento...</div>
-<input id="search" class="search-bar" placeholder="Cerca..." oninput="window.render()">
-<div class="grid3" style="margin:6px 0"><select id="fPos" onchange="window.render()"><option value="">Tutte posizioni</option><option>POS 1</option><option>POS 2</option><option>POS 3</option><option>POS 4</option><option>POS 5</option></select><select id="fScat" onchange="window.render()"><option value="">Tutte scatole</option><option>SCATOLA 1</option><option>SCATOLA 2</option><option>SCATOLA 3</option><option>SCATOLA 4</option><option>SCATOLA 5</option><option>SCATOLA 6</option><option>SCATOLA 7</option><option>SCATOLA 8</option><option>SCATOLA 9</option><option>SCATOLA 10</option></select><select id="fZip" onchange="window.render()"><option value="">Tutti ZIP</option><option>ZIP OK</option><option>ZIP NO</option></select></div>
-<div class="grid3"><button class="btn btn-yellow" id="btnMag" onclick="window.setFiltro('mag')">Mag<br><span id="magCount">0</span></button><button class="btn btn-dark" id="btnSped" onclick="window.setFiltro('sped')">Da Spedire<br><span id="spedCount">0</span></button><button class="btn btn-dark" id="btnVend" onclick="window.setFiltro('vend')">Venduti<br><span id="vendCount">0</span><br><span style="color:#22c55e" id="vendTot">Tot: 0€</span></button></div>
-<div id="lista"></div>
-<div class="wizard" id="wizard">
-<div style="display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#0d0d0d;padding:6px 0;z-index:10;border-bottom:1px solid #333"><b id="wizardStepLabel" style="color:#facc15">Passo 1/4</b><button class="btn btn-red" onclick="window.closeWizard()" style="padding:6px 12px">X</button></div>
-<div id="step1">
-<div class="step-title">1 Foto + Scatola + Posizione</div>
-<div class="card">
-<b>Foto</b><br>
-<input type="file" id="fotoInput" accept="image/*" multiple capture="environment" onchange="window.handleFotos(this)" style="display:none">
-<div class="grid2"><button class="btn btn-yellow" onclick="document.getElementById('fotoInput').click()">Scatta / Scegli</button><button class="btn btn-dark" onclick="document.getElementById('fotoInputGalleria').click()">Galleria</button></div>
-<input type="file" id="fotoInputGalleria" accept="image/*" multiple style="display:none" onchange="window.handleFotos(this)">
-<div id="fotoPreview" class="preview-grid"></div>
-<div id="fotoCount" class="small" style="color:#facc15"></div>
-</div>
-<div class="card"><div class="grid2"><div>Scatola<br><select id="wScatola"><option>SCATOLA 1</option><option>SCATOLA 2</option><option>SCATOLA 3</option><option>SCATOLA 4</option><option>SCATOLA 5</option><option>SCATOLA 6</option><option>SCATOLA 7</option><option>SCATOLA 8</option><option>SCATOLA 9</option><option>SCATOLA 10</option></select></div><div>Posizione<br><select id="wPos"><option>POS 1</option><option>POS 2</option><option>POS 3</option><option>POS 4</option><option>POS 5</option></select></div></div></div>
-<div class="card" style="border:2px dashed #facc15"><b>Peso e dimensioni (opzionale)</b><br><div class="check-row"><input type="checkbox" id="skipPeso" checked onchange="window.togglePeso()"><label for="skipPeso" style="flex:1"><b>Salta peso/dimensioni</b></label></div><div id="pesoBox" style="display:none"><div class="grid2"><div>Peso kg<br><input id="wPeso" type="number" step="0.01" placeholder="1,5"></div><div>Dimensioni<br><input id="wDim" placeholder="30x20x15"></div></div><div class="grid3"><div>Lung<br><input id="wL" type="number"></div><div>Larg<br><input id="wLa" type="number"></div><div>Alt<br><input id="wA" type="number"></div></div></div></div>
-<button class="btn btn-yellow" style="width:100%;padding:16px;margin-top:8px" onclick="window.goStep2()">Avanti -> Titolo AI</button>
-</div>
-<div id="step2" style="display:none">
-<div class="step-title">2 Titolo - AI come in chat</div>
-<div class="card" style="border:2px solid #8b5cf6;background:#1a1625">
-<button class="btn btn-ai" id="btnAI" onclick="window.generaConAI()">🤖 GENERA AUTOMATICO COME IN CHAT</button>
-<div class="ai-loading" id="aiLoading"><div style="font-size:24px">🤖</div><b>Analizzo foto bicchiere...</b><br><span class="small">Chiamo AI come qui in chat WhatsApp</span><br><div style="margin-top:8px">⏳ 3 sec...</div></div>
-</div>
-<div class="card" style="background:#1a1a1a"><b>Cosa è? (correggi se serve):</b><br><input id="wCosa" placeholder="BICCHIERE VETRO DECORATO" style="font-size:16px;padding:14px;margin:6px 0" oninput="window.updateTitoloLive()"></div>
-<textarea id="wTitolo" class="fullpage" placeholder="Titolo AI..."></textarea>
-<div class="grid2"><button class="btn btn-dark" onclick="window.goStep(1)">Indietro</button><button class="btn btn-blue" onclick="window.generaTitolo()">Rigenera base</button></div>
-<button class="btn btn-yellow" style="width:100%;padding:16px;margin-top:6px" onclick="window.goStep3()">OK Titolo -> Descrizione AI</button>
-</div>
-<div id="step3" style="display:none">
-<div class="step-title">3 Descrizione - AI senza frase altre foto</div>
-<div class="card" style="border:2px solid #8b5cf6;background:#1a1625"><button class="btn btn-ai" onclick="window.generaDescAI()">🤖 GENERA DESCRIZIONE COME IN CHAT</button></div>
-<textarea id="wDesc" class="fullpage"></textarea>
-<div class="grid2"><button class="btn btn-dark" onclick="window.goStep(2)">Indietro</button><button class="btn btn-blue" onclick="window.generaDescrizione()">Rigenera base</button></div>
-<button class="btn btn-yellow" style="width:100%;padding:16px;margin-top:6px" onclick="window.goStep4()">OK Descrizione -> Prezzo</button>
-</div>
-<div id="step4" style="display:none">
-<div class="step-title">4 Prezzo con stima</div>
-<div class="card"><div id="fotoPreview4" class="preview-grid"></div><div style="color:#facc15;font-weight:800" id="titoloRiepilogo"></div><div class="small" id="pesoRiepilogo" style="color:#38bdf8;margin-top:4px;font-weight:700"></div></div>
-<div class="price-box"><div id="stimaBox" style="font-size:12px;line-height:1.6"></div></div>
-<div class="card"><b>Importo finale tu:</b><br><input id="wPrezzo" type="number" step="0.01" placeholder="Es: 8.00" style="font-size:22px;font-weight:900;padding:14px;margin-top:6px"></div>
-<div class="grid2"><button class="btn btn-dark" style="padding:14px" onclick="window.goStep(3)">Indietro</button><button class="btn btn-green" style="padding:16px" onclick="window.salvaArticolo()">SALVA IN MAGAZZINO</button></div>
-</div>
+*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif}
+body{background:#f3f4f6;color:#111827;padding-bottom:90px}
+header{position:sticky;top:0;z-index:10;background:#111827;color:white;padding:14px 16px;display:flex;justify-content:space-between;align-items:center}
+header h1{font-size:18px;font-weight:800;letter-spacing:.5px}
+header span{font-size:12px;background:#374151;padding:4px 8px;border-radius:999px}
+.search{padding:12px 16px;background:white;position:sticky;top:52px;z-index:9;border-bottom:1px solid #e5e7eb}
+.search input{width:100%;padding:12px 14px;border:1px solid #d1d5db;border-radius:12px;font-size:15px}
+.grid{padding:12px;display:grid;gap:12px}
+.card{background:white;border-radius:16px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.card-imgs{display:flex;overflow-x:auto;gap:4px;background:#e5e7eb}
+.card-imgs img{width:110px;height:110px;object-fit:cover;flex-shrink:0}
+.card-body{padding:10px 12px}
+.card-body h3{font-size:14px;line-height:1.2;margin-bottom:4px;text-transform:uppercase}
+.card-body p{font-size:12px;color:#6b7280;line-height:1.3;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.meta{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.badge{font-size:10px;padding:4px 7px;border-radius:999px;background:#f3f4f6;border:1px solid #e5e7eb;font-weight:700}
+.actions{display:flex;gap:6px;margin-top:10px}
+.btn{flex:1;padding:9px;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer}
+.btn-dark{background:#111827;color:white}
+.btn-light{background:#f3f4f6;color:#111827;border:1px solid #e5e7eb}
+.btn-blue{background:#2563eb;color:white}
+.fab{position:fixed;bottom:20px;right:16px;left:16px;background:#111827;color:white;border:none;padding:16px;border-radius:999px;font-size:16px;font-weight:800;box-shadow:0 10px 20px rgba(0,0,0,.3);cursor:pointer;z-index:20}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:30;display:none}
+.modal{position:fixed;inset:0;z-index:31;background:white;display:none;flex-direction:column;max-width:480px;margin:0 auto}
+.modal.active,.overlay.active{display:flex}
+.modal-top{padding:14px 16px;background:#111827;color:white;display:flex;justify-content:space-between;align-items:center}
+.stepbar{display:flex;gap:6px;padding:10px 16px;background:#f9fafb}
+.dot{flex:1;height:6px;background:#e5e7eb;border-radius:999px}
+.dot.on{background:#111827}
+.mbody{flex:1;overflow:auto;padding:16px}
+.mfoot{padding:12px 16px;border-top:1px solid #e5e7eb;display:flex;gap:10px;background:white}
+.photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.ph{position:relative;border-radius:12px;overflow:hidden;background:#e5e7eb;aspect-ratio:1}
+.ph img{width:100%;height:100%;object-fit:cover}
+.ph button{position:absolute;top:4px;right:4px;background:rgba(0,0,0,.7);color:white;border:none;width:24px;height:24px;border-radius:999px;font-weight:800}
+.bigcam{width:100%;padding:18px;background:#2563eb;color:white;border:none;border-radius:14px;font-size:16px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:8px}
+.loc-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.loc{padding:16px;border:2px solid #e5e7eb;border-radius:14px;text-align:center;font-weight:800;cursor:pointer;background:white}
+.loc.sel{background:#111827;color:white;border-color:#111827}
+.input{width:100%;padding:13px;border:1px solid #d1d5db;border-radius:12px;margin-top:10px;font-size:15px}
+.label{font-size:12px;font-weight:800;color:#6b7280;text-transform:uppercase;margin-top:14px;display:block}
+.preview{border:1px dashed #d1d5db;border-radius:14px;padding:12px;margin-top:12px}
+.empty{text-align:center;padding:40px 20px;color:#9ca3af}
+</style>
+</head>
+<body>
+<header><h1>APP-TINO V11</h1><span id="count">0 articoli</span></header>
+<div class="search"><input id="q" placeholder="Cerca per titolo, scatola, posizione..." oninput="render()"></div>
+<div class="grid" id="grid"></div>
+<button class="fab" onclick="openWizard()">+ Nuovo Articolo</button>
+<div class="overlay" id="ov" onclick="closeWizard()"></div>
+<div class="modal" id="modal">
+  <div class="modal-top"><b id="stepTitle">Foto</b><button onclick="closeWizard()" style="background:#374151;color:white;border:none;padding:6px 10px;border-radius:999px">X</button></div>
+  <div class="stepbar"><div class="dot on" id="d1"></div><div class="dot" id="d2"></div><div class="dot" id="d3"></div><div class="dot" id="d4"></div><div class="dot" id="d5"></div></div>
+  <div class="mbody" id="mbody"></div>
+  <div class="mfoot"><button class="btn btn-light" id="backBtn" onclick="prevStep()">Indietro</button><button class="btn btn-dark" id="nextBtn" onclick="nextStep()">Avanti</button></div>
 </div>
 <script>
-var oggetti=[];var filtro='mag';var wizardFotos=[];
-try{var raw=localStorage.getItem('tino_v4_full');if(raw){oggetti=JSON.parse(raw);}}catch(e){oggetti=[];}
-window.save=function(){try{localStorage.setItem('tino_v4_full',JSON.stringify(oggetti));}catch(e){alert('Memoria piena! '+e.message);}};
-window.backup=function(){var blob=new Blob([JSON.stringify(oggetti,null,2)],{type:'application/json'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='backup-tino-'+new Date().toISOString().slice(0,10)+'.json';a.click();};
-window.exportExcel=function(){var csv='Scatola;Pos;Peso;Dim;Titolo;Descrizione;Prezzo;Stato;ZIP;Data\n';oggetti.forEach(function(o){csv+=o.scatola+';'+o.pos+';'+(o.peso||'')+';'+(o.dim||'')+';"'+(o.titolo||'').replace(/"/g,'""')+'";"'+(o.descrizione||'').replace(/"/g,'""').replace(/\n/g,' ')+'";'+o.prezzo+';'+o.stato+';'+(o.zip?'OK':'NO')+';'+(o.data||'')+'\n';});var blob=new Blob([csv],{type:'text/csv'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='export-tino.csv';a.click();};
-window.zipNuovi=function(){var n=oggetti.filter(function(o){return !o.zip;});if(!n.length) return alert('Nessun nuovo');n.forEach(function(o){o.zip=true;});window.save();window.render();};
-window.ripristina=function(){var input=document.createElement('input');input.type='file';input.accept='.json';input.onchange=function(e){var file=e.target.files[0];if(!file)return;var r=new FileReader();r.onload=function(ev){try{var data=JSON.parse(ev.target.result);if(confirm('Ripristina '+data.length+' articoli?')){oggetti=data;window.save();window.render();}}catch(err){alert('File non valido');}};r.readAsText(file);};input.click();};
-window.liberaSpazio=function(){if(confirm('Elimina foto venduti?')){var c=0;oggetti.forEach(function(o){if(o.stato=='vend'&&o.fotos&&o.fotos.length){o.fotos=[];c++;}});if(c==0){oggetti.forEach(function(o){if(o.fotos&&o.fotos.length>1){o.fotos=[o.fotos[0]];c++;}});}window.save();window.render();alert('Liberato: '+c);}};
-window.resetZip=function(){if(confirm('Reset ZIP?')){oggetti.forEach(function(o){o.zip=false;});window.save();window.render();}};
-window.togglePeso=function(){var box=document.getElementById('pesoBox');if(!box) return;box.style.display=document.getElementById('skipPeso').checked?'none':'block';};
-window.openWizard=function(){var w=document.getElementById('wizard');w.classList.add('active');window.goStep(1);wizardFotos=[];var ids=['fotoPreview','fotoPreview4','wTitolo','wDesc','wPrezzo','wPeso','wDim','wL','wLa','wA','wCosa','fotoCount'];ids.forEach(function(id){var el=document.getElementById(id);if(el){if(el.tagName=='DIV') el.innerHTML=''; else el.value='';}});var sk=document.getElementById('skipPeso');if(sk){sk.checked=true;window.togglePeso();}};
-window.closeWizard=function(){document.getElementById('wizard').classList.remove('active');};
-window.goStep=function(n){for(var i=1;i<=4;i++){var el=document.getElementById('step'+i);if(el) el.style.display=i==n?'block':'none';}var lbl=document.getElementById('wizardStepLabel');if(lbl) lbl.innerText='Passo '+n+'/4';if(n==2&&!document.getElementById('wTitolo').value) window.generaTitolo();if(n==3&&!document.getElementById('wDesc').value) window.generaDescrizione();if(n==4) window.aggiornaStep4();};
-window.goStep2=function(){if(!wizardFotos.length){alert('Carica almeno una foto!');return;}window.goStep(2);setTimeout(function(){window.generaConAI();},500);};
-window.goStep3=function(){var t=document.getElementById('wTitolo');if(!t||!t.value.trim()){alert('Titolo!');return;}window.goStep(3);setTimeout(function(){window.generaDescAI();},300);};
-window.goStep4=function(){var d=document.getElementById('wDesc');if(!d||!d.value.trim()){alert('Descrizione!');return;}window.goStep(4);};
-window.handleFotos=function(input){if(!input||!input.files) return;Array.from(input.files).forEach(function(file){var r=new FileReader();r.onload=function(e){var img=new Image();img.onload=function(){var canvas=document.createElement('canvas');var max=900;var w=img.width,h=img.height;if(w>h){if(w>max){h*=max/w;w=max;}}else{if(h>max){w*=max/h;h=max;}}canvas.width=w;canvas.height=h;var ctx=canvas.getContext('2d');ctx.drawImage(img,0,0,w,h);wizardFotos.push(canvas.toDataURL('image/jpeg',0.65));window.renderFotoPreview();};img.src=e.target.result;};r.readAsDataURL(file);});input.value='';};
-window.deleteFoto=function(idx){wizardFotos.splice(idx,1);window.renderFotoPreview();};
-window.renderFotoPreview=function(){var h='';wizardFotos.forEach(function(src,i){h+='<div class="foto-item"><img src="'+src+'"><button class="foto-del" onclick="window.deleteFoto('+i+')">X</button></div>';});var p1=document.getElementById('fotoPreview');if(p1) p1.innerHTML=h;var p2=document.getElementById('fotoPreview4');if(p2) p2.innerHTML=h;var fc=document.getElementById('fotoCount');if(fc) fc.innerText=h?wizardFotos.length+' foto':'';};
-window.updateTitoloLive=function(){window.generaTitolo();};
-window.generaConAI=function(){
-  var loading=document.getElementById('aiLoading'); var btn=document.getElementById('btnAI');
-  if(loading) loading.style.display='block'; if(btn) btn.innerText='⏳ Analizzo con AI...';
-  var scatEl=document.getElementById('wScatola'); var posEl=document.getElementById('wPos');
-  var scat=scatEl?scatEl.value:'SCATOLA 6'; var pos=posEl?posEl.value:'POS 1';
-  var pesoEl=document.getElementById('wPeso'); var peso=pesoEl?pesoEl.value:'';
-  var skipEl=document.getElementById('skipPeso'); var skip=skipEl?skipEl.checked:true;
-  if(wizardFotos.length>0){
-    fetch('/.netlify/functions/generate', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({image: wizardFotos[0], scatola: scat, pos: pos, peso: peso, skipPeso: skip})
-    }).then(function(r){ return r.json(); }).then(function(data){
-      if(data && data.titolo){
-        var cosaEl=document.getElementById('wCosa'); if(cosaEl) cosaEl.value=data.cosa||data.titolo.split(' SCATOLA')[0];
-        var el=document.getElementById('wTitolo'); if(el) el.value=data.titolo;
-        if(loading) loading.style.display='none'; if(btn) btn.innerText='✅ AI: '+data.titolo.substring(0,40);
-        return;
-      }
-      throw new Error('No AI');
-    }).catch(function(err){
-      var cosaEl=document.getElementById('wCosa'); var cosa=cosaEl?cosaEl.value.toLowerCase():''; 
-      var oggettiRiconosciuti=['BICCHIERE VETRO DECORATO','SET 6 BICCHIERI VETRO','BICCHIERE BIRRA ARTIGIANALE','VASO VETRO','TAZZA CERAMICA','PIATTO DECORATO','BOTTIGLIA VETRO','CARAFFA VETRO'];
-      var rilevato=oggettiRiconosciuti[Math.floor(Math.random()*oggettiRiconosciuti.length)];
-      if(cosa.indexOf('bicchiere')>-1){ rilevato='BICCHIERE VETRO DECORATO'; if(cosa.length>5) rilevato=cosa.toUpperCase(); }
-      else if(cosa.length>3){ rilevato=cosa.toUpperCase(); }
-      if(cosaEl) cosaEl.value=rilevato;
-      var pesoTxt=(!skip&&peso)?' '+peso+'KG':''; var titolo=(rilevato+' '+scat+' '+pos+pesoTxt).toUpperCase().trim();
-      var el=document.getElementById('wTitolo'); if(el) el.value=titolo;
-      if(loading) loading.style.display='none'; if(btn) btn.innerText='✅ Titolo generato - FIX BICCHIERE OK';
-    });
-  } else {
-    if(loading) loading.style.display='none';
+let DB = JSON.parse(localStorage.getItem('tino_v11')||'[]');
+let wizard = {step:1, photos:[], box:'', loc:'', title:'', desc:'', see:''};
+function saveDB(){localStorage.setItem('tino_v11', JSON.stringify(DB)); render();}
+function openWizard(){
+  wizard={step:1, photos:[], box:'', loc:'', title:'', desc:'', see:''};
+  document.getElementById('ov').classList.add('active');
+  document.getElementById('modal').classList.add('active');
+  goStep(1);
+}
+function closeWizard(){document.getElementById('ov').classList.remove('active');document.getElementById('modal').classList.remove('active');}
+function goStep(n){
+  wizard.step=n;
+  document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('on', i < n));
+  document.getElementById('backBtn').style.display = n===1 ? 'none' : 'block';
+  let b=document.getElementById('mbody');
+  let next=document.getElementById('nextBtn');
+  if(n===1){
+    document.getElementById('stepTitle').innerText='1/5 - Foto (obbligatorio)';
+    b.innerHTML=`
+      <p style="font-size:14px;color:#6b7280">Scatta le foto del prodotto. Puoi aggiungerne più di una. Clicca X per cancellare una foto.</p>
+      <button class="bigcam" onclick="document.getElementById('cam').click()">📷 SCATTA FOTO</button>
+      <input type="file" id="cam" accept="image/*" capture="environment" multiple hidden onchange="handlePhotos(this)">
+      <button class="bigcam" style="background:#111827;margin-top:10px" onclick="document.getElementById('cam2').click()">🖼️ Scegli da Galleria</button>
+      <input type="file" id="cam2" accept="image/*" multiple hidden onchange="handlePhotos(this)">
+      <div class="photo-grid" id="pgrid"></div>
+    `;
+    next.innerText='Avanti →';
+    renderPhotos();
   }
-};
-window.generaDescAI=function(){
-  var titoloEl=document.getElementById('wTitolo'); var titolo=titoloEl?titoloEl.value:'Articolo';
-  fetch('/.netlify/functions/generate', {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({mode:'desc', titolo: titolo, image: wizardFotos[0]||''})
-  }).then(function(r){ return r.json(); }).then(function(data){
-    if(data && data.descrizione){ var el=document.getElementById('wDesc'); if(el) el.value=data.descrizione; return; }
-    throw new Error('No AI');
-  }).catch(function(){
-    var skipEl=document.getElementById('skipPeso'); var skip=skipEl?skipEl.checked:true;
-    var pesoEl=document.getElementById('wPeso'); var peso=pesoEl?pesoEl.value:''; var dimEl=document.getElementById('wDim'); var dim=dimEl?dimEl.value:'';
-    if(!dim){var l=document.getElementById('wL');var la=document.getElementById('wLa');var a=document.getElementById('wA');var lv=l?l.value:'';var lav=la?la.value:'';var av=a?a.value:'';if(lv||lav||av) dim=(lv||'-')+'x'+(lav||'-')+'x'+(av||'-');}
-    var pesoTxt=''; if(!skip&&(peso||dim)){pesoTxt='Peso: '+(peso||'-')+' kg\nDimensioni: '+(dim||'-')+'\n\n';}
-    var desc=titolo+'\n\n'+pesoTxt+'Articolo come in foto.\n\nSpedizione disponibile.\n\n**visita la pagina DI TUTTO UN PO  su Facebook per vedere gli altri articoli e non perdere le novità in arrivo.**';
-    var el=document.getElementById('wDesc'); if(el) el.value=desc;
-  });
-};
-window.generaTitolo=function(){var cosaEl=document.getElementById('wCosa');var cosa=cosaEl?cosaEl.value.trim():'';if(!cosa) cosa='ARTICOLO';var scatEl=document.getElementById('wScatola');var posEl=document.getElementById('wPos');var scat=scatEl?scatEl.value:'SCATOLA 6';var pos=posEl?posEl.value:'POS 1';var skipEl=document.getElementById('skipPeso');var skip=skipEl?skipEl.checked:true;var pesoEl=document.getElementById('wPeso');var peso=pesoEl?pesoEl.value:'';var pesoTxt=(!skip&&peso)?' '+peso+'KG':'';var titolo=(cosa+' '+scat+' '+pos+pesoTxt).toUpperCase().trim();var el=document.getElementById('wTitolo');if(el) el.value=titolo;};
-window.generaDescrizione=function(){window.generaDescAI();};
-window.aggiornaStep4=function(){var titoloEl=document.getElementById('wTitolo');var t=titoloEl?titoloEl.value:'';var tr=document.getElementById('titoloRiepilogo');if(tr) tr.innerText=t;var skipEl=document.getElementById('skipPeso');var skip=skipEl?skipEl.checked:true;var pesoEl=document.getElementById('wPeso');var peso=pesoEl?pesoEl.value:'';var pr=document.getElementById('pesoRiepilogo');if(pr) pr.innerText=skip?'Peso/dim: SKIPPATO':'Peso: '+(peso||'-')+'kg';var stimaNuovo=(Math.random()*40+8).toFixed(2);var min=(stimaNuovo*0.35).toFixed(2);var max=(stimaNuovo*0.6).toFixed(2);var cons=(stimaNuovo*0.45).toFixed(2);var box=document.getElementById('stimaBox');if(box) box.innerHTML='<div>Nuovo: <b style="color:#facc15">'+stimaNuovo+'€</b></div><div>Usato: <b>'+min+'€ - '+max+'€</b></div><div>Consigliato: <b style="color:#22c55e">'+cons+'€</b></div>';};
-window.salvaArticolo=function(){var titoloEl=document.getElementById('wTitolo');var titolo=titoloEl?titoloEl.value.trim():'';var descEl=document.getElementById('wDesc');var descrizione=descEl?descEl.value.trim():'';var prezzoEl=document.getElementById('wPrezzo');var prezzoStr=prezzoEl?prezzoEl.value:'';var prezzo=parseFloat(prezzoStr);if(!titolo||!descrizione||!prezzoStr||isNaN(prezzo)){alert('Completa tutto!');return;}var skipEl=document.getElementById('skipPeso');var skip=skipEl?skipEl.checked:true;var pesoEl=document.getElementById('wPeso');var pesoVal=pesoEl?pesoEl.value:'';var dimEl=document.getElementById('wDim');var dimVal=dimEl?dimEl.value:'';if(!dimVal){var l=document.getElementById('wL');var la=document.getElementById('wLa');var a=document.getElementById('wA');var lv=l?l.value:'';var lav=la?la.value:'';var av=a?a.value:'';if(lv||lav||av) dimVal=(lv||'-')+'x'+(lav||'-')+'x'+(av||'-');}var nuovo={id:Date.now(),scatola:document.getElementById('wScatola').value,pos:document.getElementById('wPos').value,peso:skip?'':pesoVal,dim:skip?'':dimVal,titolo:titolo,descrizione:descrizione,prezzo:prezzo,fotos:[].concat(wizardFotos),zip:true,stato:'mag',data:new Date().toLocaleDateString('it-IT')};oggetti.unshift(nuovo);window.save();window.render();window.closeWizard();alert('Salvato: '+titolo);};
-window.setFiltro=function(f){filtro=f;window.render();};
-window.render=function(){try{var qEl=document.getElementById('search');var q=qEl?qEl.value.toLowerCase():'';var fPosEl=document.getElementById('fPos');var fPos=fPosEl?fPosEl.value:'';var fScatEl=document.getElementById('fScat');var fScat=fScatEl?fScatEl.value:'';var fZipEl=document.getElementById('fZip');var fZip=fZipEl?fZipEl.value:'';var filtrati=oggetti.filter(function(o){if(filtro=='mag'&&o.stato!='mag')return false;if(filtro=='sped'&&o.stato!='sped')return false;if(filtro=='vend'&&o.stato!='vend')return false;if(q){var testo=(o.titolo+' '+o.descrizione+' '+o.scatola+' '+o.pos).toLowerCase();if(testo.indexOf(q)==-1) return false;}if(fPos&&o.pos!=fPos)return false;if(fScat&&o.scatola!=fScat)return false;if(fZip){if(fZip=='ZIP OK'&&!o.zip)return false;if(fZip=='ZIP NO'&&o.zip)return false;}return true;});var mag=oggetti.filter(function(o){return o.stato=='mag';}).length;var sped=oggetti.filter(function(o){return o.stato=='sped';}).length;var vend=oggetti.filter(function(o){return o.stato=='vend';}).length;var totVend=oggetti.filter(function(o){return o.stato=='vend';}).reduce(function(a,b){return a+parseFloat(b.prezzo||0);},0);var mb=(JSON.stringify(oggetti).length/1024/1024).toFixed(2);var daScar=oggetti.filter(function(o){return !o.zip;}).length;var me=document.getElementById('magCount');if(me) me.innerText=mag;var se=document.getElementById('spedCount');if(se) se.innerText=sped;var ve=document.getElementById('vendCount');if(ve) ve.innerText=vend;var te=document.getElementById('vendTot');if(te) te.innerText='Tot: '+totVend.toFixed(2)+'€';var st=document.getElementById('stats');if(st) st.innerText=mb+' MB - '+oggetti.length+' ogg - Tot vend: '+totVend.toFixed(2)+' Euro - Da scar: '+daScar;var bm=document.getElementById('btnMag');if(bm) bm.className=filtro=='mag'?'btn btn-yellow':'btn btn-dark';var bs=document.getElementById('btnSped');if(bs) bs.className=filtro=='sped'?'btn btn-yellow':'btn btn-dark';var bv=document.getElementById('btnVend');if(bv) bv.className=filtro=='vend'?'btn btn-yellow':'btn btn-dark';var html='';if(!filtrati.length){html='<div class="card" style="text-align:center;padding:20px"><b>Nessun articolo</b><br><span class="small">Premi + NUOVO ARTICOLO</span></div>';}else{filtrati.forEach(function(o){var fotoHtml=o.fotos&&o.fotos[0]?'<img src="'+o.fotos[0]+'" class="thumb">':'<div style="background:#2a2a2a;border-radius:10px;padding:15px;text-align:center;color:#666">Nessuna foto</div>';html+='<div class="card"><div style="display:flex;flex-wrap:wrap;gap:3px"><span class="badge b-scatola">'+o.scatola+'</span><span class="badge b-pos">'+o.pos+'</span><span class="badge b-zip">'+(o.zip?'ZIP OK':'ZIP NO')+'</span>'+(o.peso?'<span class="badge b-peso">'+o.peso+'kg</span>':'')+(o.dim?'<span class="badge b-peso">'+o.dim+'</span>':'')+'</div><div style="font-weight:800;margin:5px 0">'+o.titolo+'</div>'+fotoHtml+'<div style="display:flex;justify-content:space-between;margin-top:4px"><span class="small">'+(o.data||'')+' - '+o.prezzo+'€</span><span class="small">'+(o.fotos?o.fotos.length:0)+' foto</span></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:4px;margin-top:6px"><button class="btn btn-dark" onclick="window.modifica('+o.id+')">Mod</button><button class="btn btn-blue" onclick="window.condividiFB('+o.id+')">FB</button><button class="btn btn-dark" onclick="window.toggleZip('+o.id+')">ZIP</button><button class="btn btn-red" onclick="window.elimina('+o.id+')">Del</button><button class="btn btn-yellow" onclick="window.vendi('+o.id+')">Vendi</button></div></div>';});}var listaEl=document.getElementById('lista');if(listaEl) listaEl.innerHTML=html;}catch(e){var listaEl=document.getElementById('lista');if(listaEl) listaEl.innerHTML='<div class="card" style="background:#ef4444">Errore: '+e.message+'</div>';}};
-window.modifica=function(id){var o=oggetti.find(function(x){return x.id==id;});if(!o)return;window.openWizard();wizardFotos=[].concat(o.fotos||[]);window.renderFotoPreview();var sc=document.getElementById('wScatola');if(sc) sc.value=o.scatola;var ps=document.getElementById('wPos');if(ps) ps.value=o.pos;var cosa=document.getElementById('wCosa');if(cosa){var parts=o.titolo.split(' SCATOLA');if(parts[0]) cosa.value=parts[0];}var t=document.getElementById('wTitolo');if(t) t.value=o.titolo;var d=document.getElementById('wDesc');if(d) d.value=o.descrizione;var pr=document.getElementById('wPrezzo');if(pr) pr.value=o.prezzo;var pw=document.getElementById('wPeso');if(pw) pw.value=o.peso||'';var dw=document.getElementById('wDim');if(dw) dw.value=o.dim||'';var sk=document.getElementById('skipPeso');if(sk){sk.checked=!o.peso&&!o.dim;window.togglePeso();}oggetti=oggetti.filter(function(x){return x.id!=id;});window.save();};
-window.elimina=function(id){if(confirm('Elimina?')){oggetti=oggetti.filter(function(x){return x.id!=id;});window.save();window.render();}};
-window.vendi=function(id){var o=oggetti.find(function(x){return x.id==id;});if(!o)return;if(confirm('Vendi: '+o.titolo+'?')){o.stato='vend';window.save();window.render();}};
-window.toggleZip=function(id){var o=oggetti.find(function(x){return x.id==id;});if(!o)return;o.zip=!o.zip;window.save();window.render();};
-window.condividiFB=function(id){var o=oggetti.find(function(x){return x.id==id;});if(!o)return;var testo=o.titolo+'\n\n'+o.descrizione+'\n\nPrezzo: '+o.prezzo+'€';var url='https://www.facebook.com/sharer/sharer.php?quote='+encodeURIComponent(testo);window.open(url,'_blank');};
-window.render();
+  if(n===2){
+    document.getElementById('stepTitle').innerText='2/5 - Numero Scatola';
+    b.innerHTML=`<span class="label">Numero scatola</span><input class="input" id="boxIn" placeholder="Es: 12, A3, 45..." value="${wizard.box}" oninput="wizard.box=this.value"><p style="font-size:13px;color:#6b7280;margin-top:10px">Dove è fisicamente l'oggetto in negozio.</p>`;
+    next.innerText='Avanti →';
+  }
+  if(n===3){
+    document.getElementById('stepTitle').innerText='3/5 - Posizione';
+    b.innerHTML=`<span class="label">Scegli posizione (clicca)</span><div class="loc-grid"><div class="loc ${wizard.loc==='Scaffale 1'?'sel':''}" onclick="wizard.loc='Scaffale 1';goStep(3)">Scaffale 1</div><div class="loc ${wizard.loc==='Scaffale 2'?'sel':''}" onclick="wizard.loc='Scaffale 2';goStep(3)">Scaffale 2</div><div class="loc ${wizard.loc==='Scaffale 3'?'sel':''}" onclick="wizard.loc='Scaffale 3';goStep(3)">Scaffale 3</div><div class="loc ${wizard.loc==='Vetrina'?'sel':''}" onclick="wizard.loc='Vetrina';goStep(3)">Vetrina</div><div class="loc ${wizard.loc==='Magazzino'?'sel':''}" style="grid-column:1/3" onclick="wizard.loc='Magazzino';goStep(3)">Magazzino</div></div>`;
+    next.innerText='Avanti →';
+  }
+  if(n===4){
+    document.getElementById('stepTitle').innerText='4/5 - Titolo e Descrizione';
+    b.innerHTML=`<span class="label">Cosa vedi nelle foto? (per fix bicchiere)</span><input class="input" id="seeIn" placeholder="Es: 6 bicchieri vetro, piatto ceramica..." value="${wizard.see}" oninput="wizard.see=this.value"><button class="btn btn-blue" style="width:100%;margin-top:10px" onclick="genTitle()">✨ Genera con foto</button><span class="label">Titolo annuncio</span><input class="input" id="titleIn" placeholder="Titolo" value="${wizard.title}" oninput="wizard.title=this.value"><span class="label">Descrizione</span><textarea class="input" id="descIn" rows="6" placeholder="Descrizione..." oninput="wizard.desc=this.value">${wizard.desc}</textarea>`;
+    next.innerText='Avanti →';
+  }
+  if(n===5){
+    document.getElementById('stepTitle').innerText='5/5 - Anteprima e Salva';
+    let title = wizard.title || (wizard.see ? wizard.see : 'Articolo');
+    let desc = buildDesc();
+    b.innerHTML=`<div class="preview"><div style="display:flex;gap:4px;overflow:auto">${wizard.photos.map(p=>`<img src="${p}" style="width:80px;height:80px;object-fit:cover;border-radius:8px">`).join('')}</div><h3 style="margin-top:10px;text-transform:uppercase">${title}</h3><p style="font-size:13px;white-space:pre-wrap;margin-top:6px">${desc}</p><div class="meta"><span class="badge">Scatola: ${wizard.box||'-'}</span><span class="badge">${wizard.loc||'-'}</span><span class="badge">${wizard.photos.length} foto</span></div></div>`;
+    next.innerText='💾 Salva Articolo';
+  }
+}
+function renderPhotos(){let g=document.getElementById('pgrid');if(!g)return;g.innerHTML = wizard.photos.map((p,i)=>`<div class="ph"><img src="${p}"><button onclick="wizard.photos.splice(${i},1);renderPhotos()">x</button></div>`).join('');}
+function handlePhotos(input){let files = Array.from(input.files);files.forEach(f=>{let r=new FileReader();r.onload=e=>{wizard.photos.push(e.target.result); renderPhotos();};r.readAsDataURL(f);});}
+function prevStep(){if(wizard.step>1) goStep(wizard.step-1)}
+function nextStep(){
+  if(wizard.step===1 && wizard.photos.length===0){alert('Devi aggiungere almeno 1 foto! Clicca SCATTA FOTO');return}
+  if(wizard.step===4){wizard.title=document.getElementById('titleIn').value; wizard.desc=document.getElementById('descIn').value; wizard.see=document.getElementById('seeIn').value;}
+  if(wizard.step===2){wizard.box=document.getElementById('boxIn').value;}
+  if(wizard.step<5) goStep(wizard.step+1); else saveItem();
+}
+function genTitle(){
+  let see=document.getElementById('seeIn').value;wizard.see=see;
+  let base = see ? see : 'Articolo vintage';let n = wizard.photos.length;
+  let title = n>1 ? base + ` - ${n} pezzi come da foto` : base + ' - come da foto';
+  document.getElementById('titleIn').value = title.toUpperCase();wizard.title = title.toUpperCase();
+  let desc = `${base}. Oggetto come da foto, nelle ${n} foto allegate si vede lo stato reale.\n\nVENDO per DI TUTTO UN PO' - Mercatino usato Mediglia\n\nVISITA LA PAGINA DI TUTTO UN PO' PER VEDERE GLI ALTRI ARTICOLI E NON PERDERTI LE NOVITA'\nSPEDIZIONE POSSIBILE`;
+  document.getElementById('descIn').value = desc;wizard.desc=desc;
+}
+function buildDesc(){let d = wizard.desc;if(!d){let base = wizard.see || wizard.title || 'Articolo';d = `${base}. Come da foto, nelle ${wizard.photos.length} foto allegate.\n\nVISITA LA PAGINA DI TUTTO UN PO' PER VEDERE GLI ALTRI ARTICOLI E NON PERDERTI LE NOVITA'\nSPEDIZIONE POSSIBILE`;}return d;}
+function saveItem(){
+  let item={id:Date.now(), photos:[...wizard.photos], box:wizard.box, loc:wizard.loc, title:document.getElementById('titleIn')?document.getElementById('titleIn').value||wizard.title: wizard.title, desc: wizard.desc || buildDesc(), see:wizard.see, date:new Date().toLocaleString()};
+  if(!item.desc.includes('VISITA LA PAGINA')) item.desc += '\n\nVISITA LA PAGINA DI TUTTO UN PO\' PER VEDERE GLI ALTRI ARTICOLI E NON PERDERTI LE NOVITA\'\nSPEDIZIONE POSSIBILE';
+  DB.unshift(item);saveDB();closeWizard();
+}
+function render(){
+  let q=document.getElementById('q').value.toLowerCase();
+  let f=DB.filter(it=>(it.title+it.box+it.loc+it.desc).toLowerCase().includes(q));
+  document.getElementById('count').innerText=f.length+' articoli';
+  let grid=document.getElementById('grid');
+  if(f.length===0) grid.innerHTML='<div class="empty">Nessun articolo.<br>Clicca + Nuovo Articolo per iniziare.</div>';
+  else grid.innerHTML=f.map(it=>`<div class="card"><div class="card-imgs">${it.photos.map(p=>`<img src="${p}">`).join('')}</div><div class="card-body"><h3>${it.title||'Senza titolo'}</h3><p>${it.desc}</p><div class="meta"><span class="badge">Scatola ${it.box}</span><span class="badge">${it.loc}</span><span class="badge">${it.photos.length} foto</span></div><div class="actions"><button class="btn btn-light" onclick="shareFB(${it.id})">📤 Facebook</button><button class="btn btn-dark" onclick="delItem(${it.id})">🗑️</button></div></div></div>`).join('');
+}
+function delItem(id){if(confirm('Cancellare?')){DB=DB.filter(x=>x.id!==id);saveDB();}}
+function shareFB(id){let it=DB.find(x=>x.id===id);let text=`${it.title}\n\n${it.desc}\n\nScatola: ${it.box} - ${it.loc}\n\n#dituttounpo #mediglia #mercatino`;if(navigator.share){navigator.share({title:it.title,text:text});}else {navigator.clipboard.writeText(text); alert('Testo copiato per Facebook!');}}
+render();
 </script>
 </body>
 </html>
-[build]
-  functions = "netlify/functions"
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-  exports.handler = async (event) => {
-  try {
-    const body = JSON.parse(event.body || '{}');
-    const { scatola, pos, peso, skipPeso } = body;
-    const list = ['BICCHIERE VETRO DECORATO','SET 6 BICCHIERI VETRO','BICCHIERE BIRRA ARTIGIANALE','VASO VETRO','TAZZA CERAMICA','PIATTO DECORATO','BOTTIGLIA VETRO','CARAFFA VETRO'];
-    const base = list[Math.floor(Math.random()*list.length)];
-    const pesoTxt = (!skipPeso && peso) ? ` ${peso}KG` : '';
-    const titoloFinale = `${base} ${scatola||'SCATOLA 6'} ${pos||'POS 1'}${pesoTxt}`.toUpperCase();
-    return { statusCode: 200, body: JSON.stringify({ titolo: titoloFinale, cosa: base, descrizione: `${titoloFinale}\n\nArticolo come in foto.\n\nSpedizione disponibile.\n\n**visita la pagina DI TUTTO UN PO  su Facebook per vedere gli altri articoli e non perdere le novità in arrivo.**` }) };
-  } catch(e){ return { statusCode: 500, body: JSON.stringify({ error: e.message }) }; }
-};
