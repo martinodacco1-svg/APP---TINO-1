@@ -1,69 +1,4 @@
-<!doctype html>
-<html lang="it">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>L'APP - TINO</title>
-<style>
-  *{box-sizing:border-box}
-  body{margin:0;font-family:system-ui;background:#0f1115;color:#e5e7eb;padding-bottom:120px}
-  header{position:sticky;top:0;z-index:10;background:#0f1115ee;backdrop-filter:blur(10px);border-bottom:1px solid #222;padding:10px 16px;display:flex;justify-content:space-between;align-items:center}
-  button{border:0;border-radius:12px;padding:10px 14px;font-weight:800;cursor:pointer}
-  input,select,textarea{width:100%;background:#171a23;border:1px solid #333;color:#fff;border-radius:10px;padding:10px;margin-top:4px;font-size:14px}
-  label{font-size:12px;color:#9aa3b2;margin-top:12px;display:block;font-weight:600}
-  .y{background:#facc15;color:#000;font-size:16px;padding:16px;width:100%;border-radius:14px;font-weight:800}
-  .g{background:#22c55e;color:#000}
-  .b{background:#06b6d4;color:#000}
-  .d{background:#1e222e;color:#fff;border:1px solid #333}
-  .ai-btn{background:linear-gradient(135deg, #8b5cf6, #ec4899);color:#fff;margin-top:8px;width:100%;display:flex;align-items:center;justify-content:center;gap:6px}
-  .container{padding:16px;max-width:600px;margin:0 auto}
-  .card{background:#1a1d27;border:1px solid #2a2d3a;border-radius:16px;padding:12px;margin-bottom:12px}
-  
-  /* Modali Wizard */
-  .wizard-overlay{position:fixed;inset:0;background:#000d;z-index:99999;display:none;align-items:center;justify-content:center;padding:16px}
-  .wizard-overlay.on{display:flex}
-  .wizard-box{background:#1e222e;border:1px solid #333;border-radius:18px;padding:20px;width:100%;max-width:480px;max-height:90vh;overflow:auto}
-  .wizard-title{font-size:18px;font-weight:800;color:#facc15;margin-bottom:4px}
-  .wizard-step-info{font-size:11px;color:#6b7280;margin-bottom:14px}
-  
-  /* Anteprima miniature foto scattate */
-  .thumbs-preview{display:flex;gap:8px;overflow-x:auto;margin-top:8px;padding-bottom:4px}
-  .thumb-item{position:relative;flex:0 0 60px;height:60px}
-  .thumb-item img{width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #444}
-  
-  /* Box stime prezzi */
-  .market-estimates{background:#13151d;border:1px solid #2a2d3a;border-radius:12px;padding:10px;margin-top:8px;font-size:12px}
-  .market-row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #222}
-  .market-row:last-child{border-bottom:0}
-</style>
-</head>
-<body>
-
-<header>
-  <h2>L'APP - TINO</h2>
-  <button class="y" style="width:auto;padding:8px 14px;font-size:13px;" onclick="startNewObjectFlow()">+ Nuovo Oggetto</button>
-</header>
-
-<div class="container">
-  <div id="itemList">
-    <div class="card">
-      <p style="margin:0;color:#9aa3b2;text-align:center;">Nessun oggetto inserito. Clicca su "+ Nuovo Oggetto" per iniziare.</p>
-    </div>
-  </div>
-</div>
-
-<!-- Input file nascosto per la fotocamera -->
-<input type="file" id="cameraInput" accept="image/*" capture="environment" multiple style="display:none" onchange="handleImagesSelected(event)">
-
-<!-- WIZARD MODAL CONTAINER -->
-<div id="wizardModal" class="wizard-overlay">
-  <div class="wizard-box" id="wizardContent">
-    <!-- Dinamicamente popolato dal JS -->
-  </div>
-</div>
-
 <script>
-  // Stato temporaneo dell'oggetto in creazione
   let currentObj = {
     images: [],
     box: '',
@@ -75,8 +10,34 @@
     priceFinal: ''
   };
 
+  // Recupera o imposta la chiave API di OpenAI
+  function getOpenAIApiKey() {
+    let key = localStorage.getItem('openai_key');
+    if (!key) {
+      key = prompt("Inserisci la tua chiave API di OpenAI (inizia con sk-...):");
+      if (key) {
+        localStorage.setItem('openai_key', key.trim());
+      }
+    }
+    return key;
+  }
+
+  function openSettings() {
+    const currentKey = localStorage.getItem('openai_key') || '';
+    const newKey = prompt("Modifica la tua chiave API di OpenAI:", currentKey);
+    if (newKey !== null) {
+      localStorage.setItem('openai_key', newKey.trim());
+      alert("Chiave API salvata con successo!");
+    }
+  }
+
   // 1. Avvio: Apre subito la fotocamera
   function startNewObjectFlow() {
+    const apiKey = getOpenAIApiKey();
+    if (!apiKey) {
+      alert("È necessaria una chiave API OpenAI valida per utilizzare l'IA.");
+      return;
+    }
     currentObj = { images: [], box: '', location: '', title: '', description: '', priceNew: '', estimatedMarket: {}, priceFinal: '' };
     document.getElementById('cameraInput').click();
   }
@@ -86,20 +47,21 @@
     const files = event.target.files;
     if (!files || files.length === 0) return;
     
+    let loadedCount = 0;
     for (let file of files) {
       const reader = new FileReader();
       reader.onload = function(e) {
         currentObj.images.push(e.target.result);
-        if (currentObj.images.length === files.length) {
-          openBoxStep(); // Passa al prossimo step: Scatola
+        loadedCount++;
+        if (loadedCount === files.length) {
+          openBoxStep(); // Passa allo step successivo
         }
       }
       reader.readAsDataURL(file);
     }
-    event.target.value = ''; // Reset input
+    event.target.value = '';
   }
 
-  // Apre il modale Wizard
   function showWizard(htmlContent) {
     document.getElementById('wizardContent').innerHTML = htmlContent;
     document.getElementById('wizardModal').classList.add('on');
@@ -111,10 +73,8 @@
       <div class="wizard-title">📦 Scatola</div>
       <div class="wizard-step-info">Step 1 di 5 - Dove viene riposto l'oggetto?</div>
       
-      <div style="display:flex;gap:6px;margin-bottom:8px">
-        <div class="thumbs-preview" style="flex:1">
-          ${currentObj.images.map(img => `<div class="thumb-item"><img src="${img}"></div>`).join('')}
-        </div>
+      <div class="thumbs-preview">
+        ${currentObj.images.map(img => `<div class="thumb-item"><img src="${img}"></div>`).join('')}
       </div>
 
       <label>Numero o Nome Scatola</label>
@@ -153,7 +113,7 @@
     openTitleStep();
   }
 
-  // STEP 4: TITOLO CON IA
+  // STEP 4: TITOLO CON IA REALE (GPT-4o-mini)
   function openTitleStep() {
     showWizard(`
       <div class="wizard-title">🏷️ Titolo Prodotto</div>
@@ -162,7 +122,7 @@
       <label>Titolo dell'oggetto</label>
       <input type="text" id="inputTitle" placeholder="Es. Trapano Bosch Professionale 18V" value="${currentObj.title}">
       
-      <button class="ai-btn" onclick="aiCompleteTitle()">✨ Completa Titolo con IA (Legge le foto)</button>
+      <button class="ai-btn" onclick="aiAnalyzeImageForDetails()">✨ Analizza Foto con IA (Titolo & Descrizione)</button>
       
       <div style="display:flex;gap:8px;margin-top:16px">
         <button class="d" style="flex:1" onclick="openLocationStep()">Indietro</button>
@@ -171,17 +131,71 @@
     `);
   }
 
-  // Funzione IA simulata (o collegabile a un endpoint GitHub / API Vision)
-  async function aiCompleteTitle() {
+  // Funzione che interroga OpenAI Vision usando la prima foto scattata
+  async function aiAnalyzeImageForDetails() {
+    const apiKey = getOpenAIApiKey();
+    if (!apiKey) return alert("Inserisci prima la chiave API!");
+
     const btn = event.target;
-    btn.innerText = "⏳ Analisi immagini in corso...";
-    
-    // Simula chiamata IA (qui potresti integrare una chiamata a OpenAI GPT-4o Vision o API backend ospitata su GitHub)
-    setTimeout(() => {
-      document.getElementById('inputTitle').value = "LEGO Star Wars Millennium Falcon 75257 (Completo)";
-      btn.innerText = "✨ Completato con successo!";
-      setTimeout(() => btn.innerText = "✨ Completa Titolo con IA (Legge le foto)", 2000);
-    }, 1200);
+    btn.innerText = "⏳ Analisi foto con OpenAI in corso...";
+    btn.disabled = true;
+
+    try {
+      const base64Image = currentObj.images[0]; // Prende la prima foto
+
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: "gpt-4o-mini", // Veloce ed economico per immagini
+          messages: [
+            {
+              role: "user",
+              content: [
+                {
+                  type: "text",
+                  text: "Sei un esperto di e-commerce e inventario. Analizza questa foto dell'oggetto. Restituisci un JSON rigoroso con esattamente due chiavi: 'title' (un titolo commerciale chiaro e sintetico per un annuncio di vendita) e 'description' (una descrizione dettagliata che include condizioni presunte, marca/modello se visibili e caratteristiche)."
+                },
+                {
+                  type: "image_url",
+                  image_url: { url: base64Image }
+                }
+              ]
+            }
+          ],
+          response_format: { type: "json_object" }
+        })
+      });
+
+      const data = await response.json();
+      if (data.error) {
+        throw new Error(data.error.message);
+      }
+
+      const result = JSON.parse(data.choices[0].message.content);
+      
+      // Salva i dati nell'oggetto corrente
+      currentObj.title = result.title || "";
+      currentObj.description = result.description || "";
+
+      // Aggiorna il campo input se visibile
+      const titleInput = document.getElementById('inputTitle');
+      if (titleInput) titleInput.value = currentObj.title;
+
+      btn.innerText = "✨ Analisi completata con successo!";
+      setTimeout(() => {
+        btn.innerText = "✨ Analizza Foto con IA (Titolo & Descrizione)";
+        btn.disabled = false;
+      }, 2000);
+
+    } catch (error) {
+      alert("Errore durante la chiamata a OpenAI: " + error.message);
+      btn.innerText = "✨ Analizza Foto con IA (Titolo & Descrizione)";
+      btn.disabled = false;
+    }
   }
 
   function saveTitleAndNext() {
@@ -189,16 +203,14 @@
     openDescriptionStep();
   }
 
-  // STEP 5: DESCRIZIONE CON IA
+  // STEP 5: DESCRIZIONE
   function openDescriptionStep() {
     showWizard(`
       <div class="wizard-title">📝 Descrizione</div>
       <div class="wizard-step-info">Step 4 di 5 - Dettagli e condizioni dell'oggetto</div>
       
-      <label>Descrizione dettagliata</label>
-      <textarea id="inputDesc" rows="4" placeholder="Condizioni, accessori inclusi, difetti...">${currentObj.description}</textarea>
-      
-      <button class="ai-btn" onclick="aiCompleteDesc()">✨ Genera Descrizione con IA</button>
+      <label>Descrizione dettagliata (generata o modificabile)</label>
+      <textarea id="inputDesc" rows="5">${currentObj.description}</textarea>
       
       <div style="display:flex;gap:8px;margin-top:16px">
         <button class="d" style="flex:1" onclick="openTitleStep()">Indietro</button>
@@ -207,26 +219,17 @@
     `);
   }
 
-  function aiCompleteDesc() {
-    const btn = event.target;
-    btn.innerText = "⏳ Generazione descrizione...";
-    setTimeout(() => {
-      document.getElementById('inputDesc').value = "Ottime condizioni, usato pochissimo. Scatola originale aperta ma completa di tutti i pezzi e manuale di istruzioni. Perfetto per collezionisti.";
-      btn.innerText = "✨ Generata!";
-      setTimeout(() => btn.innerText = "✨ Genera Descrizione con IA", 2000);
-    }, 1200);
-  }
-
   function saveDescAndNext() {
     currentObj.description = document.getElementById('inputDesc').value;
-    // Simuliamo valori di mercato in base al titolo
-    currentObj.priceNew = "149.99";
+    
+    // Stime indicative di prezzo (puoi anche farle stimare da OpenAI se desideri)
+    currentObj.priceNew = "120,00";
     currentObj.estimatedMarket = {
-      subito: "85,00 € - 110,00 €",
-      vinted: "80,00 € - 100,00 €",
-      wallapop: "90,00 € - 105,00 €",
-      ebay: "99,00 € - 120,00 €",
-      marketplace: "85,00 €"
+      subito: "50,00 € - 70,00 €",
+      vinted: "45,00 € - 65,00 €",
+      wallapop: "50,00 € - 60,00 €",
+      ebay: "60,00 € - 80,00 €",
+      marketplace: "55,00 €"
     };
     openPriceStep();
   }
@@ -248,7 +251,7 @@
       </div>
 
       <label style="margin-top:14px">Il tuo prezzo di vendita (€)</label>
-      <input type="number" step="0.01" id="inputFinalPrice" placeholder="Es. 90.00" value="${currentObj.priceFinal}">
+      <input type="number" step="0.01" id="inputFinalPrice" placeholder="Es. 50.00" value="${currentObj.priceFinal}">
       
       <div style="display:flex;gap:8px;margin-top:16px">
         <button class="d" style="flex:1" onclick="openDescriptionStep()">Indietro</button>
@@ -267,7 +270,6 @@
     document.getElementById('wizardModal').classList.remove('on');
   }
 
-  // Salvataggio e visualizzazione nella lista principale
   let itemsDB = [];
   function saveItemToDatabase(item) {
     itemsDB.unshift(item);
@@ -285,7 +287,7 @@
       <div class="card" style="display:flex;gap:12px;align-items:center;">
         <img src="${i.images[0] || 'https://via.placeholder.com/60'}" style="width:60px;height:60px;object-fit:cover;border-radius:10px;">
         <div style="flex:1">
-          <div style="font-weight:800;font-size:15px">${i.title}</div>
+          <div style="font-weight:800;font-size:15-px">${i.title}</div>
           <div style="font-size:12px;color:#9aa3b2;margin-top:2px">Box: ${i.box || '-'} | Pos: ${i.location || '-'}</div>
           <div style="font-weight:700;color:#22c55e;margin-top:4px">€ ${i.priceFinal || '0.00'}</div>
         </div>
@@ -293,6 +295,3 @@
     `).join('');
   }
 </script>
-
-</body>
-</html>
