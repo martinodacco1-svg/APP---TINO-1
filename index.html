@@ -2,153 +2,114 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>APP-TINO V11</title>
-<meta name="theme-color" content="#111827">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>APP-TINO V10 AI</title>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.0/dist/mobilenet.min.js"></script>
 <style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif}
-body{background:#f3f4f6;color:#111827;padding-bottom:90px}
-header{position:sticky;top:0;z-index:10;background:#111827;color:white;padding:14px 16px;display:flex;justify-content:space-between;align-items:center}
-header h1{font-size:18px;font-weight:800;letter-spacing:.5px}
-header span{font-size:12px;background:#374151;padding:4px 8px;border-radius:999px}
-.search{padding:12px 16px;background:white;position:sticky;top:52px;z-index:9;border-bottom:1px solid #e5e7eb}
-.search input{width:100%;padding:12px 14px;border:1px solid #d1d5db;border-radius:12px;font-size:15px}
-.grid{padding:12px;display:grid;gap:12px}
-.card{background:white;border-radius:16px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.1)}
-.card-imgs{display:flex;overflow-x:auto;gap:4px;background:#e5e7eb}
-.card-imgs img{width:110px;height:110px;object-fit:cover;flex-shrink:0}
-.card-body{padding:10px 12px}
-.card-body h3{font-size:14px;line-height:1.2;margin-bottom:4px;text-transform:uppercase}
-.card-body p{font-size:12px;color:#6b7280;line-height:1.3;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-.meta{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
-.badge{font-size:10px;padding:4px 7px;border-radius:999px;background:#f3f4f6;border:1px solid #e5e7eb;font-weight:700}
-.actions{display:flex;gap:6px;margin-top:10px}
-.btn{flex:1;padding:9px;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer}
-.btn-dark{background:#111827;color:white}
-.btn-light{background:#f3f4f6;color:#111827;border:1px solid #e5e7eb}
-.btn-blue{background:#2563eb;color:white}
-.fab{position:fixed;bottom:20px;right:16px;left:16px;background:#111827;color:white;border:none;padding:16px;border-radius:999px;font-size:16px;font-weight:800;box-shadow:0 10px 20px rgba(0,0,0,.3);cursor:pointer;z-index:20}
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:30;display:none}
-.modal{position:fixed;inset:0;z-index:31;background:white;display:none;flex-direction:column;max-width:480px;margin:0 auto}
-.modal.active,.overlay.active{display:flex}
-.modal-top{padding:14px 16px;background:#111827;color:white;display:flex;justify-content:space-between;align-items:center}
-.stepbar{display:flex;gap:6px;padding:10px 16px;background:#f9fafb}
-.dot{flex:1;height:6px;background:#e5e7eb;border-radius:999px}
-.dot.on{background:#111827}
-.mbody{flex:1;overflow:auto;padding:16px}
-.mfoot{padding:12px 16px;border-top:1px solid #e5e7eb;display:flex;gap:10px;background:white}
-.photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
-.ph{position:relative;border-radius:12px;overflow:hidden;background:#e5e7eb;aspect-ratio:1}
-.ph img{width:100%;height:100%;object-fit:cover}
-.ph button{position:absolute;top:4px;right:4px;background:rgba(0,0,0,.7);color:white;border:none;width:24px;height:24px;border-radius:999px;font-weight:800}
-.bigcam{width:100%;padding:18px;background:#2563eb;color:white;border:none;border-radius:14px;font-size:16px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:8px}
-.loc-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
-.loc{padding:16px;border:2px solid #e5e7eb;border-radius:14px;text-align:center;font-weight:800;cursor:pointer;background:white}
-.loc.sel{background:#111827;color:white;border-color:#111827}
-.input{width:100%;padding:13px;border:1px solid #d1d5db;border-radius:12px;margin-top:10px;font-size:15px}
-.label{font-size:12px;font-weight:800;color:#6b7280;text-transform:uppercase;margin-top:14px;display:block}
-.preview{border:1px dashed #d1d5db;border-radius:14px;padding:12px;margin-top:12px}
-.empty{text-align:center;padding:40px 20px;color:#9ca3af}
+*{box-sizing:border-box;margin:0;padding:0;font-family:sans-serif}
+body{background:#f3f4f6;padding:12px;padding-bottom:80px}
+h1{text-align:center;padding:10px;font-size:20px;background:#111827;color:white;border-radius:12px;margin-bottom:12px}
+.card{background:white;border-radius:14px;padding:12px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+input,textarea,select{width:100%;padding:12px;margin-top:8px;border:1px solid #d1d5db;border-radius:10px;font-size:15px}
+button{padding:12px;border:none;border-radius:10px;font-weight:800;cursor:pointer}
+.btn-blue{background:#2563eb;color:white;width:100%;margin-top:8px}
+.btn-dark{background:#111827;color:white;width:100%;margin-top:8px}
+.btn-light{background:#e5e7eb;color:#111827;margin-top:8px}
+img.thumb{width:80px;height:80px;object-fit:cover;border-radius:8px;margin:4px}
+#gallery{display:flex;flex-wrap:wrap}
+.badge{display:inline-block;background:#f3f4f6;border:1px solid #e5e7eb;padding:4px 8px;border-radius:99px;font-size:11px;margin-top:6px;font-weight:700}
 </style>
 </head>
 <body>
-<header><h1>APP-TINO V11</h1><span id="count">0 articoli</span></header>
-<div class="search"><input id="q" placeholder="Cerca per titolo, scatola, posizione..." oninput="render()"></div>
-<div class="grid" id="grid"></div>
-<button class="fab" onclick="openWizard()">+ Nuovo Articolo</button>
-<div class="overlay" id="ov" onclick="closeWizard()"></div>
-<div class="modal" id="modal">
-  <div class="modal-top"><b id="stepTitle">Foto</b><button onclick="closeWizard()" style="background:#374151;color:white;border:none;padding:6px 10px;border-radius:999px">X</button></div>
-  <div class="stepbar"><div class="dot on" id="d1"></div><div class="dot" id="d2"></div><div class="dot" id="d3"></div><div class="dot" id="d4"></div><div class="dot" id="d5"></div></div>
-  <div class="mbody" id="mbody"></div>
-  <div class="mfoot"><button class="btn btn-light" id="backBtn" onclick="prevStep()">Indietro</button><button class="btn btn-dark" id="nextBtn" onclick="nextStep()">Avanti</button></div>
+<h1>APP-TINO - DI TUTTO UN PO'</h1>
+
+<div class="card">
+<b>1. FOTO (fai foto al mouse, tastiera, qualsiasi cosa)</b>
+<input type="file" id="foto" accept="image/*" capture="environment" multiple onchange="loadPhotos(this)">
+<div id="gallery"></div>
+<button class="btn-blue" onclick="riconosciAI()">✨ RICONOSCI OGGETTO DALLA FOTO (AI)</button>
+<p id="aiStatus" style="font-size:12px;color:#6b7280;margin-top:6px;text-align:center"></p>
 </div>
+
+<div class="card">
+<b>2. DATI</b>
+<input id="scatola" placeholder="Numero Scatola es: 12">
+<select id="pos"><option>Scaffale 1</option><option>Scaffale 2</option><option>Scaffale 3</option><option>Vetrina</option><option>Magazzino</option></select>
+<input id="titolo" placeholder="Titolo annuncio - verrà generato dall'AI">
+<textarea id="desc" rows="6" placeholder="Descrizione - verrà generata dall'AI"></textarea>
+<input id="prezzo" placeholder="Prezzo consigliato es: 10€">
+<button class="btn-dark" onclick="salva()">💾 SALVA ARTICOLO</button>
+</div>
+
+<div id="lista"></div>
+
 <script>
-let DB = JSON.parse(localStorage.getItem('tino_v11')||'[]');
-let wizard = {step:1, photos:[], box:'', loc:'', title:'', desc:'', see:''};
-function saveDB(){localStorage.setItem('tino_v11', JSON.stringify(DB)); render();}
-function openWizard(){
-  wizard={step:1, photos:[], box:'', loc:'', title:'', desc:'', see:''};
-  document.getElementById('ov').classList.add('active');
-  document.getElementById('modal').classList.add('active');
-  goStep(1);
+let photosData=[];
+let DB=JSON.parse(localStorage.getItem('tino_v10_ai')||'[]');
+let model=null;
+
+async function loadModel(){
+ document.getElementById('aiStatus').innerText='Carico AI... primo avvio 10 sec';
+ model=await mobilenet.load();
+ document.getElementById('aiStatus').innerText='AI pronta! Fai foto e clicca Riconosci';
 }
-function closeWizard(){document.getElementById('ov').classList.remove('active');document.getElementById('modal').classList.remove('active');}
-function goStep(n){
-  wizard.step=n;
-  document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('on', i < n));
-  document.getElementById('backBtn').style.display = n===1 ? 'none' : 'block';
-  let b=document.getElementById('mbody');
-  let next=document.getElementById('nextBtn');
-  if(n===1){
-    document.getElementById('stepTitle').innerText='1/5 - Foto (obbligatorio)';
-    b.innerHTML=`
-      <p style="font-size:14px;color:#6b7280">Scatta le foto del prodotto. Puoi aggiungerne più di una. Clicca X per cancellare una foto.</p>
-      <button class="bigcam" onclick="document.getElementById('cam').click()">📷 SCATTA FOTO</button>
-      <input type="file" id="cam" accept="image/*" capture="environment" multiple hidden onchange="handlePhotos(this)">
-      <button class="bigcam" style="background:#111827;margin-top:10px" onclick="document.getElementById('cam2').click()">🖼️ Scegli da Galleria</button>
-      <input type="file" id="cam2" accept="image/*" multiple hidden onchange="handlePhotos(this)">
-      <div class="photo-grid" id="pgrid"></div>
-    `;
-    next.innerText='Avanti →';
-    renderPhotos();
-  }
-  if(n===2){
-    document.getElementById('stepTitle').innerText='2/5 - Numero Scatola';
-    b.innerHTML=`<span class="label">Numero scatola</span><input class="input" id="boxIn" placeholder="Es: 12, A3, 45..." value="${wizard.box}" oninput="wizard.box=this.value"><p style="font-size:13px;color:#6b7280;margin-top:10px">Dove è fisicamente l'oggetto in negozio.</p>`;
-    next.innerText='Avanti →';
-  }
-  if(n===3){
-    document.getElementById('stepTitle').innerText='3/5 - Posizione';
-    b.innerHTML=`<span class="label">Scegli posizione (clicca)</span><div class="loc-grid"><div class="loc ${wizard.loc==='Scaffale 1'?'sel':''}" onclick="wizard.loc='Scaffale 1';goStep(3)">Scaffale 1</div><div class="loc ${wizard.loc==='Scaffale 2'?'sel':''}" onclick="wizard.loc='Scaffale 2';goStep(3)">Scaffale 2</div><div class="loc ${wizard.loc==='Scaffale 3'?'sel':''}" onclick="wizard.loc='Scaffale 3';goStep(3)">Scaffale 3</div><div class="loc ${wizard.loc==='Vetrina'?'sel':''}" onclick="wizard.loc='Vetrina';goStep(3)">Vetrina</div><div class="loc ${wizard.loc==='Magazzino'?'sel':''}" style="grid-column:1/3" onclick="wizard.loc='Magazzino';goStep(3)">Magazzino</div></div>`;
-    next.innerText='Avanti →';
-  }
-  if(n===4){
-    document.getElementById('stepTitle').innerText='4/5 - Titolo e Descrizione';
-    b.innerHTML=`<span class="label">Cosa vedi nelle foto? (per fix bicchiere)</span><input class="input" id="seeIn" placeholder="Es: 6 bicchieri vetro, piatto ceramica..." value="${wizard.see}" oninput="wizard.see=this.value"><button class="btn btn-blue" style="width:100%;margin-top:10px" onclick="genTitle()">✨ Genera con foto</button><span class="label">Titolo annuncio</span><input class="input" id="titleIn" placeholder="Titolo" value="${wizard.title}" oninput="wizard.title=this.value"><span class="label">Descrizione</span><textarea class="input" id="descIn" rows="6" placeholder="Descrizione..." oninput="wizard.desc=this.value">${wizard.desc}</textarea>`;
-    next.innerText='Avanti →';
-  }
-  if(n===5){
-    document.getElementById('stepTitle').innerText='5/5 - Anteprima e Salva';
-    let title = wizard.title || (wizard.see ? wizard.see : 'Articolo');
-    let desc = buildDesc();
-    b.innerHTML=`<div class="preview"><div style="display:flex;gap:4px;overflow:auto">${wizard.photos.map(p=>`<img src="${p}" style="width:80px;height:80px;object-fit:cover;border-radius:8px">`).join('')}</div><h3 style="margin-top:10px;text-transform:uppercase">${title}</h3><p style="font-size:13px;white-space:pre-wrap;margin-top:6px">${desc}</p><div class="meta"><span class="badge">Scatola: ${wizard.box||'-'}</span><span class="badge">${wizard.loc||'-'}</span><span class="badge">${wizard.photos.length} foto</span></div></div>`;
-    next.innerText='💾 Salva Articolo';
-  }
+loadModel();
+
+function loadPhotos(inp){
+ photosData=[];
+ document.getElementById('gallery').innerHTML='';
+ Array.from(inp.files).forEach(f=>{
+  let r=new FileReader();
+  r.onload=e=>{
+   photosData.push(e.target.result);
+   let img=document.createElement('img');img.src=e.target.result;img.className='thumb';
+   document.getElementById('gallery').appendChild(img);
+  };
+  r.readAsDataURL(f);
+ });
 }
-function renderPhotos(){let g=document.getElementById('pgrid');if(!g)return;g.innerHTML = wizard.photos.map((p,i)=>`<div class="ph"><img src="${p}"><button onclick="wizard.photos.splice(${i},1);renderPhotos()">x</button></div>`).join('');}
-function handlePhotos(input){let files = Array.from(input.files);files.forEach(f=>{let r=new FileReader();r.onload=e=>{wizard.photos.push(e.target.result); renderPhotos();};r.readAsDataURL(f);});}
-function prevStep(){if(wizard.step>1) goStep(wizard.step-1)}
-function nextStep(){
-  if(wizard.step===1 && wizard.photos.length===0){alert('Devi aggiungere almeno 1 foto! Clicca SCATTA FOTO');return}
-  if(wizard.step===4){wizard.title=document.getElementById('titleIn').value; wizard.desc=document.getElementById('descIn').value; wizard.see=document.getElementById('seeIn').value;}
-  if(wizard.step===2){wizard.box=document.getElementById('boxIn').value;}
-  if(wizard.step<5) goStep(wizard.step+1); else saveItem();
+
+function traduci(label){
+ label=label.toLowerCase();
+ if(label.includes('mouse')||label.includes('computer mouse')) return {it:'MOUSE PER COMPUTER', prezzo:'8€', desc:'Mouse per computer, funzionante come da foto'};
+ if(label.includes('keyboard')) return {it:'TASTIERA COMPUTER', prezzo:'15€', desc:'Tastiera per computer'};
+ if(label.includes('monitor')||label.includes('screen')) return {it:'MONITOR COMPUTER', prezzo:'30€', desc:'Monitor / schermo'};
+ if(label.includes('cellular')||label.includes('phone')) return {it:'TELEFONO CELLULARE', prezzo:'25€', desc:'Telefono'};
+ if(label.includes('cup')||label.includes('mug')) return {it:'TAZZA / BICCHIERE', prezzo:'5€', desc:'Tazza / bicchiere in ceramica/vetro'};
+ if(label.includes('plate')) return {it:'PIATTO CERAMICA', prezzo:'6€', desc:'Piatto'};
+ if(label.includes('book')) return {it:'LIBRO', prezzo:'5€', desc:'Libro usato'};
+ if(label.includes('shoe')) return {it:'SCARPE', prezzo:'12€', desc:'Scarpe usate'};
+ return {it: label.toUpperCase(), prezzo:'10€', desc: label};
 }
-function genTitle(){
-  let see=document.getElementById('seeIn').value;wizard.see=see;
-  let base = see ? see : 'Articolo vintage';let n = wizard.photos.length;
-  let title = n>1 ? base + ` - ${n} pezzi come da foto` : base + ' - come da foto';
-  document.getElementById('titleIn').value = title.toUpperCase();wizard.title = title.toUpperCase();
-  let desc = `${base}. Oggetto come da foto, nelle ${n} foto allegate si vede lo stato reale.\n\nVENDO per DI TUTTO UN PO' - Mercatino usato Mediglia\n\nVISITA LA PAGINA DI TUTTO UN PO' PER VEDERE GLI ALTRI ARTICOLI E NON PERDERTI LE NOVITA'\nSPEDIZIONE POSSIBILE`;
-  document.getElementById('descIn').value = desc;wizard.desc=desc;
+
+async function riconosciAI(){
+ if(photosData.length==0){alert('Fai prima una foto!');return}
+ if(!model){alert('AI sta caricando, aspetta 5 sec');return}
+ document.getElementById('aiStatus').innerText='Sto analizzando la foto...';
+ let img=new Image();img.src=photosData[0];
+ img.onload=async ()=>{
+  let pred=await model.classify(img);
+  let best=pred[0].className;
+  let t=traduci(best);
+  let titolo=`${t.it} - COME DA FOTO - ${photosData.length} FOTO`;
+  let descrizione=`${t.desc}. Oggetto come da foto, nelle ${photosData.length} foto allegate si vede lo stato reale e i dettagli.\n\nVENDO per DI TUTTO UN PO' - Mercatino usato Mediglia\n\nVISITA LA PAGINA DI TUTTO UN PO' PER VEDERE GLI ALTRI ARTICOLI E NON PERDERTI LE NOVITA'\nSPEDIZIONE POSSIBILE`;
+  document.getElementById('titolo').value=titolo.toUpperCase();
+  document.getElementById('desc').value=descrizione;
+  document.getElementById('prezzo').value=t.prezzo;
+  document.getElementById('aiStatus').innerText=`Riconosciuto: ${best} → ${t.it}`;
+ };
 }
-function buildDesc(){let d = wizard.desc;if(!d){let base = wizard.see || wizard.title || 'Articolo';d = `${base}. Come da foto, nelle ${wizard.photos.length} foto allegate.\n\nVISITA LA PAGINA DI TUTTO UN PO' PER VEDERE GLI ALTRI ARTICOLI E NON PERDERTI LE NOVITA'\nSPEDIZIONE POSSIBILE`;}return d;}
-function saveItem(){
-  let item={id:Date.now(), photos:[...wizard.photos], box:wizard.box, loc:wizard.loc, title:document.getElementById('titleIn')?document.getElementById('titleIn').value||wizard.title: wizard.title, desc: wizard.desc || buildDesc(), see:wizard.see, date:new Date().toLocaleString()};
-  if(!item.desc.includes('VISITA LA PAGINA')) item.desc += '\n\nVISITA LA PAGINA DI TUTTO UN PO\' PER VEDERE GLI ALTRI ARTICOLI E NON PERDERTI LE NOVITA\'\nSPEDIZIONE POSSIBILE';
-  DB.unshift(item);saveDB();closeWizard();
+
+function salva(){
+ let item={id:Date.now(), photos:photosData, scatola:document.getElementById('scatola').value, pos:document.getElementById('pos').value, titolo:document.getElementById('titolo').value, desc:document.getElementById('desc').value, prezzo:document.getElementById('prezzo').value};
+ DB.unshift(item);localStorage.setItem('tino_v10_ai',JSON.stringify(DB));render();alert('Salvato!');
 }
+
 function render(){
-  let q=document.getElementById('q').value.toLowerCase();
-  let f=DB.filter(it=>(it.title+it.box+it.loc+it.desc).toLowerCase().includes(q));
-  document.getElementById('count').innerText=f.length+' articoli';
-  let grid=document.getElementById('grid');
-  if(f.length===0) grid.innerHTML='<div class="empty">Nessun articolo.<br>Clicca + Nuovo Articolo per iniziare.</div>';
-  else grid.innerHTML=f.map(it=>`<div class="card"><div class="card-imgs">${it.photos.map(p=>`<img src="${p}">`).join('')}</div><div class="card-body"><h3>${it.title||'Senza titolo'}</h3><p>${it.desc}</p><div class="meta"><span class="badge">Scatola ${it.box}</span><span class="badge">${it.loc}</span><span class="badge">${it.photos.length} foto</span></div><div class="actions"><button class="btn btn-light" onclick="shareFB(${it.id})">📤 Facebook</button><button class="btn btn-dark" onclick="delItem(${it.id})">🗑️</button></div></div></div>`).join('');
+ let l=document.getElementById('lista');
+ l.innerHTML=DB.map(it=>`<div class="card"><div>${it.photos.map(p=>`<img src="${p}" class="thumb">`).join('')}</div><b>${it.titolo}</b><p style="font-size:13px;white-space:pre-wrap">${it.desc}</p><span class="badge">Scatola ${it.scatola}</span><span class="badge">${it.pos}</span><span class="badge">${it.prezzo}</span><br><button class="btn-light" onclick="navigator.clipboard.writeText('${it.titolo}\\n\\n${it.desc}\\nPrezzo: ${it.prezzo}'.replace(/'/g,''));alert('Copiato per Facebook')">📤 Copia per Facebook</button> <button class="btn-light" onclick="DB=DB.filter(x=>x.id!=${it.id});localStorage.setItem('tino_v10_ai',JSON.stringify(DB));render()">🗑️ Cancella</button></div>`).join('');
 }
-function delItem(id){if(confirm('Cancellare?')){DB=DB.filter(x=>x.id!==id);saveDB();}}
-function shareFB(id){let it=DB.find(x=>x.id===id);let text=`${it.title}\n\n${it.desc}\n\nScatola: ${it.box} - ${it.loc}\n\n#dituttounpo #mediglia #mercatino`;if(navigator.share){navigator.share({title:it.title,text:text});}else {navigator.clipboard.writeText(text); alert('Testo copiato per Facebook!');}}
 render();
 </script>
 </body>
